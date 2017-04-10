@@ -1,0 +1,15 @@
+0 
+receive android command flag (0x01)
+1, 2
+android password (the 2 bytes of password)
+3 
+correct password or wrong password (0x01 for correct, 0x02 for wrong)
+4
+ssid and password byte (1byte 0-9)
+5
+process complete flag (0x01)
+7
+password verification, ssid and password send complete byte
+
+
+8 
