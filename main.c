@@ -144,15 +144,15 @@ int main( void )
   Enable_EnergyHarvesting( );
 
   /* Check if no NDEF detected, init mem in Tag Type 5 */
-  if( NfcType5_NDEFDetection( ) != NDEF_OK )
+  /*if( NfcType5_NDEFDetection( ) != NDEF_OK )
   {
     CCFileStruct.MagicNumber = NFCT5_MAGICNUMBER_E1_CCFILE;
     CCFileStruct.Version = NFCT5_VERSION_V1_0;
     CCFileStruct.MemorySize = ( M24LR_MAX_SIZE / 8 ) & 0xFF;
     CCFileStruct.TT5Tag = 0x05;
-    /* Init of the Type Tag 5 component (M24LR) */
+     Init of the Type Tag 5 component (M24LR)
     while( NfcType5_TT5Init( ) != NFCTAG_OK );
-  }
+  }*/
 
   /* Set the LED2 on to indicate Init done */
   //NFC02A1_LED_ON( BLUE_LED );
@@ -175,53 +175,18 @@ int main( void )
      password[1] = 0x34;
      i=0;
      ANDROID_CONFIRMATION[0] = 0x01;
-     check[8] = 0x01;
-     check[9] = 0x02;
+     check[0] = 0x0c;
+     check[1] = 0x52;
+     check[8] = 0x21;
+     check[9] = 0x72;
      check[10] = 0x00;
+     check[11] = 0x00;
+     BSP_NFCTAG_WriteData((check), (0), 2);
      while( 1 )
      {
-    	 /*read the android flag and the password*/
-    	 BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 4);
-    	 if(NDEF_BUFFER1[0] == 0x01){
-
-   		  //read password complete, check password
-   		  if((NDEF_BUFFER1[1] == password[0]) && (NDEF_BUFFER1[2] == password[1]))
-   		  {
-   			 /*run all these when the password is correct*/
-
-   			  /*write password correct byte*/
-   			  BSP_NFCTAG_WriteData((check+8), 3, 1);
-   			/*confirmation byte to send to android on done writing ssid and pw*/
-   			   	BSP_NFCTAG_WriteData((check+8), (7), 1);
-   			   	BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 10);
-   			  /*receive and write the ssid and password from spi*/
-   			  HAL_SPI_Receive(&hspi1,&check[0],1,5000);
-   			  BSP_NFCTAG_WriteData((check), (4), 1);
-
-   				  /*reset the android command flag*/
-   			  BSP_NFCTAG_WriteData((check+10), 0, 1);
-
-
-
-   		  }
-   		  else{
-   			  /*password not correct*/
-   			BSP_NFCTAG_WriteData((check+9), 3, 1);
-   			/*reset the android command flag*/
-   			BSP_NFCTAG_WriteData((check+10), 0, 1);
-   			/*confirmation byte to send to android on done writing ssid and pw*/
-   			BSP_NFCTAG_WriteData((check+8), (7), 1);
-
-   			NFC02A1_LED_ON( GREEN_LED );
-
-   		  }
-   		  HAL_Delay(100);
-     }
-    	 else{
-    		 /*not yet receive command from android*/
-
-    	 }
-    	 HAL_Delay(100);
+    	BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 10);
+    	HAL_Delay(100);
+    	//read from spi and display here
      }
 }
 
@@ -404,7 +369,53 @@ void assert_failed( uint8_t* file, uint32_t line )
     		 	      strcpy(ssid,SSID10);
     		 	      strcpy(wifipassword,PASS10);
     		 	      break;
-    		 	  }*/
+    		 	  }
+    		 	  */
+/*while( 1 )
+    {
+   	 read the android flag and the password
+   	 BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 10);
+   	 if(NDEF_BUFFER1[0] == 0x01){
+
+  		  //read password complete, check password
+  		  if((NDEF_BUFFER1[1] == password[0]) && (NDEF_BUFFER1[2] == password[1]))
+  		  {
+  			 run all these when the password is correct
+
+  			  write password correct byte
+  			  BSP_NFCTAG_WriteData((check+8), 3, 1);
+  			confirmation byte to send to android on done writing ssid and pw
+  			   	BSP_NFCTAG_WriteData((check+8), (7), 1);
+  			   	BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 10);
+  			  receive and write the ssid and password from spi
+  			  HAL_SPI_Receive(&hspi1,&check[0],1,5000);
+  			  BSP_NFCTAG_WriteData((check), (4), 1);
+
+  				  reset the android command flag
+  			  BSP_NFCTAG_WriteData((check+10), 0, 1);
+
+
+
+  		  }
+  		  else{
+  			  password not correct
+  			BSP_NFCTAG_WriteData((check+9), 3, 1);
+  			reset the android command flag
+  			BSP_NFCTAG_WriteData((check+10), 0, 1);
+  			confirmation byte to send to android on done writing ssid and pw
+  			BSP_NFCTAG_WriteData((check+8), (7), 1);
+
+  			NFC02A1_LED_ON( GREEN_LED );
+
+  		  }
+  		  HAL_Delay(100);
+    }
+   	 else{
+   		 not yet receive command from android
+
+   	 }
+   	 HAL_Delay(100);
+    }*/
 /**
   * @}
   */
