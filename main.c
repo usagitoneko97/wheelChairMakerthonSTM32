@@ -14,10 +14,10 @@
   * You may not use this file except in compliance with the License.
   * You may obtain a copy of the License at:
   *
-  *        http://www.st.com/myliberty  
+  *        http://www.st.com/myliberty
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied,
   * AND SPECIFICALLY DISCLAIMING THE IMPLIED WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
@@ -26,7 +26,7 @@
   *
   ******************************************************************************
   */
- 
+
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l0xx_hal.h"
@@ -37,7 +37,7 @@
 
 /** @addtogroup WriteURI_Application
   * @{
-  */ 
+  */
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -97,10 +97,10 @@ int main( void )
 {
   /* STM32L0xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
-       - Systick timer is configured by default as source of time base, but user 
-             can eventually implement his proper time base source (a general purpose 
-             timer for example or other time source), keeping in mind that Time base 
-             duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
+       - Systick timer is configured by default as source of time base, but user
+             can eventually implement his proper time base source (a general purpose
+             timer for example or other time source), keeping in mind that Time base
+             duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and
              handled in milliseconds basis.
        - Low Level Initialization
      */
@@ -156,15 +156,15 @@ int main( void )
 
   /* Set the LED2 on to indicate Init done */
   //NFC02A1_LED_ON( BLUE_LED );
-  
+
   /* Prepare URI NDEF message content */
   strcpy( URI.protocol,URI_ID_0x01_STRING );
   strcpy( URI.URI_Message,"st.com/st25" );
   strcpy( URI.Information,"\0" );
-  
+
   /* Write NDEF to EEPROM */
   //while( NDEF_WriteURI( &URI ) != NDEF_OK );
-  
+
   /* Set the LED3 on to indicate Programing done */
 
 
@@ -180,23 +180,24 @@ int main( void )
      check[10] = 0x00;
      while( 1 )
      {
-    	 /*read the android flag*/
+    	 /*read the android flag and the password*/
     	 BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 4);
     	 if(NDEF_BUFFER1[0] == 0x01){
 
-    	 /*read the password*/
-    	 BSP_NFCTAG_ReadData(NDEF_BUFFER1, 1, 4);
    		  //read password complete, check password
    		  if((NDEF_BUFFER1[1] == password[0]) && (NDEF_BUFFER1[2] == password[1]))
    		  {
    			 /*run all these when the password is correct*/
 
+   			  /*write password correct byte*/
    			  BSP_NFCTAG_WriteData((check+8), 3, 1);
+   			/*confirmation byte to send to android on done writing ssid and pw*/
+   			   	BSP_NFCTAG_WriteData((check+8), (7), 1);
+   			   	BSP_NFCTAG_ReadData(NDEF_BUFFER1, 0, 10);
    			  /*receive and write the ssid and password from spi*/
    			  HAL_SPI_Receive(&hspi1,&check[0],1,5000);
    			  BSP_NFCTAG_WriteData((check), (4), 1);
-   				  /*confirmation byte to send to android on done writing ssid and pw*/
-   			  BSP_NFCTAG_WriteData((check+8), (7), 1);
+
    				  /*reset the android command flag*/
    			  BSP_NFCTAG_WriteData((check+10), 0, 1);
 
@@ -220,6 +221,7 @@ int main( void )
     		 /*not yet receive command from android*/
 
     	 }
+    	 HAL_Delay(100);
      }
 }
 
@@ -405,10 +407,10 @@ void assert_failed( uint8_t* file, uint32_t line )
     		 	  }*/
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
